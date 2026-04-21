@@ -8,12 +8,15 @@
   <meta name="description" content="Đám cưới Trọng Anh &amp; Vũ Thùy - 25/05/2026 - P.Thiên Hương, Hải Phòng">
   <!-- Open Graph -->
   <meta property="og:title" content="Thiệp Cưới Trọng Anh & Vũ Thùy - 25/05/2026">
-  <meta property="og:description" content="Trân trọng kính mời bạn đến dự lễ thành hôn của chúng tôi">
-  <meta property="og:image" content="WebP/Đầu trang.webp">
+  <meta property="og:description"
+    content="Trân trọng kính mời bạn đến dự lễ thành hôn của chúng tôi tại Thủy Nguyên, Hải Phòng">
+  <meta property="og:image" content="https://anhthuy2505-wedding.netlify.app/Đầu trang.webp">
+  <meta property="og:url" content="https://anhthuy2505-wedding.netlify.app">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Thiệp Cưới Trọng Anh & Vũ Thùy">
   <!-- Preload ảnh quan trọng nhất -->
-  <link rel="preload" as="image" href="WebP/Mở đầu.webp" type="image/webp">
-  <link rel="preload" as="image" href="WebP/Đầu trang.webp" type="image/webp">
+  <link rel="preload" as="image" href="Mở đầu.webp" type="image/webp">
+  <link rel="preload" as="image" href="Đầu trang.webp" type="image/webp">
   <!-- FONT PRELOAD & ANTI-FOUT -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -136,7 +139,7 @@
     #preloader {
       position: fixed;
       inset: 0;
-      background: url('WebP/Mở đầu.webp') left var(--opening-bg-x) top 0/cover no-repeat;
+      background: url('Mở đầu.webp') left var(--opening-bg-x) top 0/cover no-repeat;
       z-index: 9999;
       display: flex;
       align-items: center;
@@ -197,7 +200,7 @@
     #env-overlay {
       position: fixed;
       inset: 0;
-      background: url('WebP/Mở đầu.webp') left var(--opening-bg-x) top 0/cover no-repeat;
+      background: url('Mở đầu.webp') left var(--opening-bg-x) top 0/cover no-repeat;
       z-index: 999;
       display: flex;
       align-items: center;
@@ -618,7 +621,7 @@
         <div class="env-flap" id="env-flap"></div>
         <picture>
           <source srcset="Bì thư.webp" type="image/webp">
-          <img id="env-photo" src="Bì thư.jpg" width="260" height="360" loading="eager" alt="Ảnh bì thư">
+          <img id="env-photo" src="Bì thư.webp" width="260" height="360" loading="eager" alt="Ảnh bì thư mời cưới">
         </picture>
         <div
           style="position:absolute;bottom:0;left:0;width:100%;height:65%;background:linear-gradient(0deg,#e8c9a0,#f5e6d0);border-radius:0 0 12px 12px;z-index:6;clip-path:polygon(0 0,50% 20%,100% 0,100% 100%,0 100%)">
@@ -645,8 +648,8 @@
       style="position: relative; overflow: hidden;">
       <!-- Background with pop effect -->
       <picture style="position:absolute;inset:0;z-index:0;">
-        <source srcset="WebP/Đầu trang.webp" type="image/webp">
-        <img src="WebP/Đầu trang.jpg" width="1200" height="800" loading="eager" alt="Hero Background"
+        <source srcset="Đầu trang.webp" type="image/webp">
+        <img src="Đầu trang.webp" width="1200" height="800" loading="eager" alt="Ảnh nền thiệp cưới Trọng Anh Vũ Thùy"
           style="width:100%;height:100%;object-fit:cover;object-position:center top;filter: contrast(1.15) brightness(1.1);">
       </picture>
       <!-- Clearer overlay gradient -->
@@ -762,7 +765,7 @@
         <div style="width:100%;height:360px;overflow:hidden;position:relative">
           <picture>
             <source srcset="Chú rể.webp" type="image/webp">
-            <img src="Chú rể.jpg" alt="Chú Rể" width="1000" height="1333" loading="lazy"
+            <img src="Chú rể.webp" alt="Ảnh Chân Dung Chú Rể Trọng Anh" width="1000" height="1333" loading="lazy"
               style="width:100%;height:100%;object-fit:cover;object-position:center 5%">
           </picture>
         </div>
@@ -783,7 +786,7 @@
         <div style="width:100%;height:360px;overflow:hidden;position:relative">
           <picture>
             <source srcset="Cô dâu.webp" type="image/webp">
-            <img src="Cô dâu.jpg" alt="Cô Dâu" width="1000" height="1333" loading="lazy"
+            <img src="Cô dâu.webp" alt="Ảnh Chân Dung Cô Dâu Vũ Thùy" width="1000" height="1333" loading="lazy"
               style="width:100%;height:100%;object-fit:cover;object-position:top">
           </picture>
         </div>
@@ -824,8 +827,8 @@
         <div class="fade-up" style="width:100%;aspect-ratio:1/1;overflow:hidden;position:relative">
           <picture>
             <source srcset="Gia đình.webp" type="image/webp">
-            <img src="Gia đình.jpg" alt="Gia Đình Trọng Anh &amp; Vũ Thùy" width="1080" height="1080" loading="lazy"
-              style="width:100%;height:100%;object-fit:cover;object-position:center 65%">
+            <img src="Gia đình.webp" alt="Gia Đình Trọng Anh & Vũ Thùy tại lễ đường" width="1080" height="1080"
+              loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:center 65%">
           </picture>
           <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.35),transparent 50%)">
           </div>
@@ -1019,15 +1022,21 @@
             z-index: 1;
           }
 
+          #slideshow-thumbs picture {
+            width: calc(20% - 8px);
+            aspect-ratio: 3/4;
+            flex-shrink: 0;
+          }
+
           .thumb-img {
-            width: 65px;
-            height: 65px;
-            border-radius: 8px;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             cursor: pointer;
             opacity: 0.5;
             transition: 0.3s;
-            flex-shrink: 0;
+            display: block;
+            border-radius: 12px;
             border: 2px solid transparent;
           }
 
@@ -1035,7 +1044,6 @@
             opacity: 1;
             border-color: #c9a96e;
             box-shadow: 0 4px 10px rgba(201, 169, 110, 0.4);
-            transform: scale(1.05);
           }
         </style>
       </div>
@@ -1285,23 +1293,23 @@
     }
     cdTick(); setInterval(cdTick, 1000);
 
-    // Gallery Slideshow — WebP với fallback .jpg qua onerror
-    const images = Array.from({ length: 10 }, (_, i) => ({ webp: `WebP/${i + 1}.webp`, jpg: `WebP/${i + 1}.jpg` }));
+    // Gallery Slideshow (Hoàn toàn bằng .webp)
+    const images = Array.from({ length: 10 }, (_, i) => ({ webp: `Album/${i + 1}.webp`, fallback: `Album/${i + 1}.webp` }));
     const mainContainer = document.getElementById('slideshow-main');
     const thumbsContainer = document.getElementById('slideshow-thumbs');
     let currentSlide = 0;
     let slideInterval;
 
     if (mainContainer && thumbsContainer) {
-      images.forEach(({ webp, jpg }, i) => {
+      images.forEach(({ webp, fallback }, i) => {
         // Main slide: Dùng <picture> bảo đảm CSS
         const pic = document.createElement('picture');
         const src = document.createElement('source');
         src.srcset = webp; src.type = 'image/webp';
 
         const img = document.createElement('img');
-        img.src = jpg;
-        img.alt = `Album ảnh ${i + 1}`;
+        img.src = fallback;
+        img.alt = `Ảnh kỷ niệm ${i + 1}`;
         img.width = 900; img.height = 1200;
         img.className = 'slide-img' + (i === 0 ? ' active' : '');
         img.loading = i < 3 ? 'eager' : 'lazy';
@@ -1316,8 +1324,8 @@
         thumbSrc.srcset = webp; thumbSrc.type = 'image/webp';
 
         const thumbImg = document.createElement('img');
-        thumbImg.src = jpg;
-        thumbImg.alt = `Thumb ${i + 1}`;
+        thumbImg.src = fallback;
+        thumbImg.alt = `Ảnh thu nhỏ ${i + 1}`;
         thumbImg.width = 65; thumbImg.height = 65;
         thumbImg.className = 'thumb-img' + (i === 0 ? ' active' : '');
         thumbImg.loading = 'lazy';
@@ -1443,8 +1451,8 @@
 
       <!-- Top couple image -->
       <picture>
-        <source srcset="WebP/Quà cưới.webp" type="image/webp">
-        <img src="WebP/Quà cưới.jpg" alt="Cô Dâu Chú Rể" width="1200" height="900" loading="lazy"
+        <source srcset="Quà cưới.webp" type="image/webp">
+        <img src="Quà cưới.webp" alt="Mô hình Hộp quà cưới" width="1200" height="900" loading="lazy"
           style="width:100%; height:auto; aspect-ratio:4/3; object-fit:cover;">
       </picture>
 
@@ -1455,8 +1463,8 @@
         <!-- Left: QR Code -->
         <div>
           <picture>
-            <source srcset="WebP/Quà chú rể.webp" type="image/webp">
-            <img src="WebP/Quà chú rể.jpg" alt="QR Code" width="500" height="500" loading="lazy"
+            <source srcset="Quà chú rể.webp" type="image/webp">
+            <img src="Quà chú rể.webp" alt="Mã QR mừng cưới Chú rể" width="500" height="500" loading="lazy"
               style="width:100%; height:auto; border-radius:10px; border:2px solid rgba(201,169,110,0.3); box-shadow:0 8px 24px rgba(0,0,0,0.5);">
           </picture>
         </div>
