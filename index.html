@@ -1399,23 +1399,29 @@
     // Cấu trúc sheet: cột 0=Timestamp, cột 1=Tên, cột 2=Lời chúc
     // ============================================================
     (function () {
-      var SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Jjt6LhLbG9e--mzbgnFtIZ0wt05m_XFHqYuiHmH7aiM/gviz/tq?tqx=out:json';
+      var SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Jjt6LhLbG9e--mzbgnFtIZ0wt05m_XFHqYuiHmH7aiM/gviz/tq?tqx=out:json&gid=1781983843';
       var lastHash = ''; // So sánh để tránh re-render không cần thiết
 
-      // Bước 1: Bóc wrapper của Google, lấy JSON thuần
-      // Google trả về: google.visualization.Query.setResponse({...});
+      // Bước 1: Bóc wrapper của Google, lấy JSON thuần.
+      // Google trả về đúng dạng:
+      //   /*O_o*/\ngoogle.visualization.Query.setResponse({...});
+      // Prefix "/*O_o*/\ngoogle.visualization.Query.setResponse(" = 47 ký tự
+      // Suffix ");" = 2 ký tự → dùng .slice(0, -2)
       function parseGvizJSON(raw) {
         try {
-          var start = raw.indexOf('(');
-          var end = raw.lastIndexOf(')');
-          if (start === -1 || end === -1 || end <= start) {
-            throw new Error('Không tìm thấy dấu ngoặc hợp lệ');
-          }
-          var jsonStr = raw.substring(start + 1, end);
-          return JSON.parse(jsonStr);
+          var json = JSON.parse(raw.substring(47).slice(0, -2));
+          return json;
         } catch (e) {
-          console.error('[Wishes] Lỗi parse JSON:', e);
-          return null;
+          console.error('[Wishes] Lỗi parse JSON (substring):', e);
+          // Fallback: dùng indexOf nếu format thay đổi
+          try {
+            var s = raw.indexOf('(');
+            var en = raw.lastIndexOf(')');
+            return JSON.parse(raw.substring(s + 1, en));
+          } catch (e2) {
+            console.error('[Wishes] Fallback parse cũng lỗi:', e2);
+            return null;
+          }
         }
       }
 
