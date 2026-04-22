@@ -1209,6 +1209,10 @@
 
   <button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Lên đầu trang">↑</button>
 
+  <!-- Firebase SDK (compat v9 — chạy thẳng trong HTML, không cần bundler) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script>
     // Three.js particles
@@ -1395,56 +1399,31 @@
     document.querySelectorAll('.fade-up').forEach(el => { new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: .08 }).observe(el); });
 
     // ============================================================
-    // GUESTBOOK — Google Sheets realtime (cập nhật mỗi 5 giây)
-    // Cấu trúc sheet: cột 0=Timestamp, cột 1=Tên, cột 2=Lời chúc
+    // GUESTBOOK — Firebase Firestore Realtime
+    // Collection: "wishes" | Fields: name, msg, createdAt
     // ============================================================
     (function () {
-      var SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Jjt6LhLbG9e--mzbgnFtIZ0wt05m_XFHqYuiHmH7aiM/gviz/tq?tqx=out:json&gid=1781983843';
-      var lastHash = ''; // So sánh để tránh re-render không cần thiết
 
-      // Bước 1: Bóc wrapper của Google, lấy JSON thuần.
-      // Google trả về đúng dạng:
-      //   /*O_o*/\ngoogle.visualization.Query.setResponse({...});
-      // Prefix "/*O_o*/\ngoogle.visualization.Query.setResponse(" = 47 ký tự
-      // Suffix ");" = 2 ký tự → dùng .slice(0, -2)
-      function parseGvizJSON(raw) {
-        try {
-          var json = JSON.parse(raw.substring(47).slice(0, -2));
-          return json;
-        } catch (e) {
-          console.error('[Wishes] Lỗi parse JSON (substring):', e);
-          // Fallback: dùng indexOf nếu format thay đổi
-          try {
-            var s = raw.indexOf('(');
-            var en = raw.lastIndexOf(')');
-            return JSON.parse(raw.substring(s + 1, en));
-          } catch (e2) {
-            console.error('[Wishes] Fallback parse cũng lỗi:', e2);
-            return null;
-          }
-        }
+      // ---- Cấu hình Firebase ----
+      var firebaseConfig = {
+        apiKey: 'AIzaSyCsL4ZX7gRSZqS4xGUAxTrIakHPp8Kpaz4',
+        authDomain: 'wedding-55c10.firebaseapp.com',
+        projectId: 'wedding-55c10',
+        storageBucket: 'wedding-55c10.firebasestorage.app',
+        messagingSenderId: '500987579882',
+        appId: '1:500987579882:web:ce179772569fb18d19b693'
+      };
+
+      // Khởi tạo Firebase (tránh khởi tạo lại nếu đã có)
+      var app;
+      try {
+        app = firebase.app();
+      } catch (e) {
+        app = firebase.initializeApp(firebaseConfig);
       }
+      var db = firebase.firestore();
 
-      // Bước 2: Map rows → mảng { name, msg }
-      // Cột 0 = Timestamp (bỏ), Cột 1 = Tên, Cột 2 = Lời chúc
-      function extractWishes(data) {
-        if (!data || !data.table || !Array.isArray(data.table.rows)) {
-          console.warn('[Wishes] Không có data.table.rows');
-          return [];
-        }
-        console.log('[Wishes] Số hàng nhận được:', data.table.rows.length);
-        return data.table.rows
-          .map(function (row) {
-            var c = row.c || [];
-            var name = (c[1] && c[1].v != null) ? String(c[1].v).trim() : '';
-            var msg = (c[2] && c[2].v != null) ? String(c[2].v).trim() : '';
-            return { name: name, msg: msg };
-          })
-          .filter(function (w) { return w.name || w.msg; }) // Bỏ hàng trống
-          .reverse(); // Mới nhất lên đầu
-      }
-
-      // Escape HTML tránh XSS
+      // ---- Escape HTML tránh XSS ----
       function esc(s) {
         if (!s) return '';
         return s
@@ -1454,91 +1433,105 @@
           .replace(/"/g, '&quot;');
       }
 
-      // Bước 3: Render ra #wishes
-      function render(wishes) {
+      // ---- Render danh sách lời chúc ----
+      function render(docs) {
         var container = document.getElementById('wishes');
         var statusEl = document.getElementById('gb-status');
+        if (!container) return;
 
-        if (!container) {
-          console.error('[Wishes] Không tìm thấy #wishes trong DOM!');
-          return;
-        }
-
-        if (wishes.length === 0) {
+        if (docs.length === 0) {
           container.innerHTML = '<p style="text-align:center;color:rgba(122,96,85,0.6);font-size:.85rem;padding:12px 0;">Chưa có lời chúc nào. Hãy là người đầu tiên! 💌</p>';
           if (statusEl) statusEl.textContent = '0 lời chúc';
           return;
         }
 
-        // Mỗi lời chúc: <div class="wish"><strong>Tên</strong><p>Lời chúc</p></div>
-        container.innerHTML = wishes.map(function (w, i) {
+        container.innerHTML = docs.map(function (doc, i) {
+          var d = doc.data();
           return (
             '<div class="wish" style="animation-delay:' + Math.min(i * 0.07, 0.42) + 's">' +
-            '<strong>' + esc(w.name) + '</strong>' +
-            '<p>' + esc(w.msg) + '</p>' +
+            '<strong>' + esc(d.name) + '</strong>' +
+            '<p>' + esc(d.msg) + '</p>' +
             '</div>'
           );
         }).join('');
 
         if (statusEl) {
-          statusEl.textContent = '✨ ' + wishes.length + ' lời chúc · tự động cập nhật mỗi 5 giây';
+          statusEl.textContent = '✨ ' + docs.length + ' lời chúc · cập nhật theo thời gian thực';
         }
       }
 
-      // Bước 4: Fetch → parse → render (chỉ nếu có thay đổi)
-      function loadWishes() {
-        var url = SHEET_URL + '&_=' + Date.now(); // Chống cache
+      // ---- Lắng nghe thay đổi realtime (onSnapshot) ----
+      function startRealtime() {
+        var statusEl = document.getElementById('gb-status');
 
-        fetch(url)
-          .then(function (res) {
-            if (!res.ok) throw new Error('HTTP lỗi: ' + res.status);
-            return res.text();
-          })
-          .then(function (raw) {
-            console.log('[Wishes] Nhận được dữ liệu (200 ký tự đầu):', raw.slice(0, 200));
-            var data = parseGvizJSON(raw);
-            var wishes = extractWishes(data);
-            var hash = JSON.stringify(wishes);
-
-            if (hash !== lastHash) {
-              console.log('[Wishes] Dữ liệu mới, đang render', wishes.length, 'lời chúc...');
-              lastHash = hash;
-              render(wishes);
-            } else {
-              console.log('[Wishes] Không có thay đổi, bỏ qua render.');
+        db.collection('wishes')
+          .orderBy('createdAt', 'desc')   // Mới nhất lên đầu
+          .onSnapshot(
+            function (snapshot) {
+              console.log('[Firebase] Nhận', snapshot.docs.length, 'lời chúc');
+              render(snapshot.docs);
+            },
+            function (err) {
+              console.error('[Firebase] Lỗi onSnapshot:', err);
+              if (statusEl) {
+                statusEl.textContent = '⚠️ Không thể tải lời chúc: ' + err.code;
+              }
             }
-          })
-          .catch(function (e) {
-            console.error('[Wishes] Lỗi fetch:', e);
-            var statusEl = document.getElementById('gb-status');
-            if (statusEl && !lastHash) {
-              statusEl.textContent = '⚠️ Không thể tải lời chúc. Vui lòng thử lại...';
-            }
-          });
+          );
       }
 
       // Chạy sau khi DOM sẵn sàng
-      document.addEventListener('DOMContentLoaded', function () {
-        loadWishes();                         // Tải ngay
-        setInterval(loadWishes, 5000);        // Lặp mỗi 5 giây
-      });
+      document.addEventListener('DOMContentLoaded', startRealtime);
+
+      // Expose hàm addWish để form submit sử dụng
+      window._addWish = function (name, msg) {
+        return db.collection('wishes').add({
+          name: name,
+          msg: msg,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      };
 
     })();
 
-    // RSVP Form — vẫn submit bình thường (Google Form hoặc chỉ hiện thông báo)
+    // RSVP Form — Lưu vào Firebase Firestore
     document.getElementById('rsvp-form').addEventListener('submit', function (e) {
       e.preventDefault();
-      const n = document.getElementById('r-name').value.trim();
-      const m = document.getElementById('r-msg').value.trim();
-      if (!n || !m) return;
+      var n = document.getElementById('r-name').value.trim();
+      var m = document.getElementById('r-msg').value.trim();
 
-      // Hiện thông báo cảm ơn
-      const rsvpOk = document.getElementById('rsvp-ok');
-      rsvpOk.innerHTML = `💕 Cảm ơn lời chúc của <strong>${n}</strong>! Lời chúc sẽ hiển thị sau ít phút.`;
-      rsvpOk.style.display = 'block';
+      // Validate: không cho gửi nếu thiếu tên hoặc lời chúc
+      if (!n || !m) {
+        alert('Vui lòng nhập tên và lời chúc trước khi gửi! 💌');
+        return;
+      }
 
-      this.reset();
-      setTimeout(() => { rsvpOk.style.display = 'none'; }, 5000);
+      if (typeof window._addWish !== 'function') {
+        console.error('[RSVP] Firebase chưa sẵn sàng (_addWish not defined)');
+        return;
+      }
+
+      var btn = this.querySelector('button[type="submit"]');
+      var rsvpOk = document.getElementById('rsvp-ok');
+
+      // Vô hiệu hoá button khi đang gửi
+      if (btn) { btn.disabled = true; btn.textContent = 'Đang gửi...'; }
+
+      window._addWish(n, m)
+        .then(function () {
+          rsvpOk.innerHTML = '💕 Cảm ơn <strong>' + n + '</strong> đã gửi lời chúc!';
+          rsvpOk.style.display = 'block';
+          document.getElementById('rsvp-form').reset();
+          setTimeout(function () { rsvpOk.style.display = 'none'; }, 5000);
+        })
+        .catch(function (err) {
+          console.error('[RSVP] Lỗi khi lưu:', err);
+          rsvpOk.innerHTML = '⚠️ Gửi thất bại: ' + err.code + '. Vui lòng thử lại.';
+          rsvpOk.style.display = 'block';
+        })
+        .finally(function () {
+          if (btn) { btn.disabled = false; btn.textContent = 'Gửi Lời Chúc 💌'; }
+        });
     });
 
     // Copy STK
