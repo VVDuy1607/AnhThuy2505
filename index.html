@@ -8,7 +8,7 @@
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:url" content="https://anhthuy2505.pages.dev/">
+  <meta property="og:url" content="https://invitations.wedding.dpdns.org/AnhThuy2505">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Thiệp cưới Trọng Anh & Vũ Thùy">
 
@@ -1089,8 +1089,10 @@
         <!-- Guestbook Display Area -->
         <div class="fade-up" style="margin-top:32px; border-top:1px dashed rgba(201,169,110,.4); padding-top:20px;">
           <h3 class="serif" style="color:#c9a96e;font-size:1.15rem;margin-bottom:4px;">Lời chúc từ bạn bè</h3>
-          <p id="gb-status" style="font-size:.72rem;color:rgba(160,120,80,.6);margin-bottom:14px;font-family:'Poppins',sans-serif;">⏳ Đang tải...</p>
-          <div id="guestbook"
+          <p id="gb-status"
+            style="font-size:.72rem;color:rgba(160,120,80,.6);margin-bottom:14px;font-family:'Poppins',sans-serif;">⏳
+            Đang tải...</p>
+          <div id="wishes"
             style="display:flex;flex-direction:column;gap:12px;text-align:left;max-height:320px;overflow-y:auto;padding-right:6px;">
             <!-- Rendered via Google Sheets JS -->
           </div>
@@ -1392,150 +1394,133 @@
     new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: .08 }).observe.bind(null);
     document.querySelectorAll('.fade-up').forEach(el => { new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: .08 }).observe(el); });
 
-    // =====================================================
-    // GUESTBOOK — Google Sheets realtime (polling 5s)
-    // =====================================================
+    // ============================================================
+    // GUESTBOOK — Google Sheets realtime (cập nhật mỗi 5 giây)
+    // Cấu trúc sheet: cột 0=Timestamp, cột 1=Tên, cột 2=Lời chúc
+    // ============================================================
     (function () {
-      // URL Google Sheets gviz/tq
-      const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Jjt6LhLbG9e--mzbgnFtIZ0wt05m_XFHqYuiHmH7aiM/gviz/tq?tqx=out:json';
-      const POLL_INTERVAL = 5000; // 5 giây
+      var SHEET_URL = 'https://docs.google.com/spreadsheets/d/1Jjt6LhLbG9e--mzbgnFtIZ0wt05m_XFHqYuiHmH7aiM/gviz/tq?tqx=out:json';
+      var lastHash = ''; // So sánh để tránh re-render không cần thiết
 
-      let lastHash = null; // Lưu hash để tránh re-render khi không có dữ liệu mới
-
-      // Parse chuỗi JSON trả về từ Google Sheets gviz/tq
-      // Dùng indexOf/lastIndexOf để bóc wrapper — ổn định hơn regex.
-      function parseGvizResponse(raw) {
+      // Bước 1: Bóc wrapper của Google, lấy JSON thuần
+      // Google trả về: google.visualization.Query.setResponse({...});
+      function parseGvizJSON(raw) {
         try {
-          const start = raw.indexOf('(');
-          const end   = raw.lastIndexOf(')');
+          var start = raw.indexOf('(');
+          var end = raw.lastIndexOf(')');
           if (start === -1 || end === -1 || end <= start) {
-            throw new Error('Không tìm thấy wrapper JSON hợp lệ');
+            throw new Error('Không tìm thấy dấu ngoặc hợp lệ');
           }
-          const jsonStr = raw.substring(start + 1, end);
+          var jsonStr = raw.substring(start + 1, end);
           return JSON.parse(jsonStr);
-        } catch (err) {
-          console.warn('[Guestbook] Parse error:', err);
+        } catch (e) {
+          console.error('[Wishes] Lỗi parse JSON:', e);
           return null;
         }
       }
 
-      // Lấy danh sách lời chúc từ kết quả đã parse.
-      // Cấu trúc Google Sheets của bạn:
-      //   cột 0 → Dấu thời gian  (bỏ qua)
-      //   cột 1 → Tên của bạn    ← đọc vào name
-      //   cột 2 → Lời chúc       ← đọc vào msg
-      // Trả về mảng { name, msg } sắp xếp mới nhất lên đầu.
+      // Bước 2: Map rows → mảng { name, msg }
+      // Cột 0 = Timestamp (bỏ), Cột 1 = Tên, Cột 2 = Lời chúc
       function extractWishes(data) {
-        if (!data || !data.table || !Array.isArray(data.table.rows)) return [];
+        if (!data || !data.table || !Array.isArray(data.table.rows)) {
+          console.warn('[Wishes] Không có data.table.rows');
+          return [];
+        }
+        console.log('[Wishes] Số hàng nhận được:', data.table.rows.length);
         return data.table.rows
           .map(function (row) {
-            var cells = row.c || [];
-            // Safety: kiểm tra null trước khi đọc .v
-            var name = (cells[1] && cells[1].v != null) ? String(cells[1].v).trim() : '';
-            var msg  = (cells[2] && cells[2].v != null) ? String(cells[2].v).trim() : '';
+            var c = row.c || [];
+            var name = (c[1] && c[1].v != null) ? String(c[1].v).trim() : '';
+            var msg = (c[2] && c[2].v != null) ? String(c[2].v).trim() : '';
             return { name: name, msg: msg };
           })
           .filter(function (w) { return w.name || w.msg; }) // Bỏ hàng trống
           .reverse(); // Mới nhất lên đầu
       }
 
-      // Hash đơn giản để phát hiện thay đổi — tránh re-render DOM thừa
-      function hashWishes(wishes) {
-        return wishes.map(function (w) { return w.name + '::' + w.msg; }).join('||');
-      }
-
-      // Escape HTML — chống XSS
-      function escHtml(str) {
-        if (!str) return '';
-        return str
+      // Escape HTML tránh XSS
+      function esc(s) {
+        if (!s) return '';
+        return s
           .replace(/&/g, '&amp;')
           .replace(/</g, '&lt;')
           .replace(/>/g, '&gt;')
           .replace(/"/g, '&quot;');
       }
 
-      // Render danh sách lời chúc vào #guestbook
-      function renderWishes(wishes) {
-        var gb     = document.getElementById('guestbook');
-        var status = document.getElementById('gb-status');
-        if (!gb) return;
+      // Bước 3: Render ra #wishes
+      function render(wishes) {
+        var container = document.getElementById('wishes');
+        var statusEl = document.getElementById('gb-status');
 
-        if (wishes.length === 0) {
-          gb.innerHTML = '<p style="text-align:center;color:rgba(122,96,85,0.6);font-size:0.85rem;margin:10px 0;">Chưa có lời chúc nào. Hãy là người đầu tiên! 💌</p>';
-          if (status) status.textContent = '0 lời chúc';
+        if (!container) {
+          console.error('[Wishes] Không tìm thấy #wishes trong DOM!');
           return;
         }
 
-        // Render từng wish — staggered fade-in (tối đa delay 0.4s)
-        gb.innerHTML = wishes.map(function (w, i) {
-          var delay = Math.min(i * 0.06, 0.4);
+        if (wishes.length === 0) {
+          container.innerHTML = '<p style="text-align:center;color:rgba(122,96,85,0.6);font-size:.85rem;padding:12px 0;">Chưa có lời chúc nào. Hãy là người đầu tiên! 💌</p>';
+          if (statusEl) statusEl.textContent = '0 lời chúc';
+          return;
+        }
+
+        // Mỗi lời chúc: <div class="wish"><strong>Tên</strong><p>Lời chúc</p></div>
+        container.innerHTML = wishes.map(function (w, i) {
           return (
-            '<div class="wish-item" style="' +
-              'background:rgba(201,169,110,.08);' +
-              'padding:14px 16px;' +
-              'border-radius:12px;' +
-              'border-left:3px solid #c9a96e;' +
-              'animation:wishFadeIn 0.5s ease-out both;' +
-              'animation-delay:' + delay + 's;' +
-            '">' +
-              '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
-                '<span style="font-size:1rem">💌</span>' +
-                '<strong style="color:#a88350;font-family:\'Playfair Display\',serif;font-size:1rem;">' +
-                  escHtml(w.name) +
-                '</strong>' +
-              '</div>' +
-              '<p style="color:#5c3317;font-size:0.85rem;line-height:1.7;' +
-                'font-family:\'Poppins\',sans-serif;margin:0;padding-left:24px;">' +
-                escHtml(w.msg) +
-              '</p>' +
+            '<div class="wish" style="animation-delay:' + Math.min(i * 0.07, 0.42) + 's">' +
+            '<strong>' + esc(w.name) + '</strong>' +
+            '<p>' + esc(w.msg) + '</p>' +
             '</div>'
           );
         }).join('');
 
-        if (status) {
-          status.textContent = '✨ ' + wishes.length + ' lời chúc • Tự động cập nhật mỗi 5 giây';
+        if (statusEl) {
+          statusEl.textContent = '✨ ' + wishes.length + ' lời chúc · tự động cập nhật mỗi 5 giây';
         }
       }
 
-      // Fetch dữ liệu từ Google Sheets + cập nhật UI nếu có thay đổi
-      function fetchWishes() {
-        // &nocache tránh browser trả về response cũ
-        var url = SHEET_URL + '&nocache=' + Date.now();
+      // Bước 4: Fetch → parse → render (chỉ nếu có thay đổi)
+      function loadWishes() {
+        var url = SHEET_URL + '&_=' + Date.now(); // Chống cache
 
         fetch(url)
           .then(function (res) {
-            if (!res.ok) throw new Error('HTTP ' + res.status);
+            if (!res.ok) throw new Error('HTTP lỗi: ' + res.status);
             return res.text();
           })
           .then(function (raw) {
-            var data   = parseGvizResponse(raw);
+            console.log('[Wishes] Nhận được dữ liệu (200 ký tự đầu):', raw.slice(0, 200));
+            var data = parseGvizJSON(raw);
             var wishes = extractWishes(data);
-            var hash   = hashWishes(wishes);
+            var hash = JSON.stringify(wishes);
 
-            // Chỉ render lại khi dữ liệu thực sự thay đổi
             if (hash !== lastHash) {
+              console.log('[Wishes] Dữ liệu mới, đang render', wishes.length, 'lời chúc...');
               lastHash = hash;
-              renderWishes(wishes);
+              render(wishes);
+            } else {
+              console.log('[Wishes] Không có thay đổi, bỏ qua render.');
             }
           })
-          .catch(function (err) {
-            console.warn('[Guestbook] Fetch error:', err);
-            var status = document.getElementById('gb-status');
-            // Không ghi đè nếu đang hiển thị dữ liệu tốt
-            if (status && lastHash === null) {
-              status.textContent = '⚠️ Không thể tải lời chúc. Kiểm tra kết nối...';
+          .catch(function (e) {
+            console.error('[Wishes] Lỗi fetch:', e);
+            var statusEl = document.getElementById('gb-status');
+            if (statusEl && !lastHash) {
+              statusEl.textContent = '⚠️ Không thể tải lời chúc. Vui lòng thử lại...';
             }
           });
       }
 
-      // Khởi động ngay + polling mỗi 5 giây
-      fetchWishes();
-      setInterval(fetchWishes, POLL_INTERVAL);
+      // Chạy sau khi DOM sẵn sàng
+      document.addEventListener('DOMContentLoaded', function () {
+        loadWishes();                         // Tải ngay
+        setInterval(loadWishes, 5000);        // Lặp mỗi 5 giây
+      });
 
     })();
 
     // RSVP Form — vẫn submit bình thường (Google Form hoặc chỉ hiện thông báo)
-    document.getElementById('rsvp-form').addEventListener('submit', function(e) {
+    document.getElementById('rsvp-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const n = document.getElementById('r-name').value.trim();
       const m = document.getElementById('r-msg').value.trim();
@@ -1649,12 +1634,38 @@
       }
     }
 
-    /* Scrollbar đẹp cho #guestbook */
-    #guestbook::-webkit-scrollbar {
+    /* ===== .wish — thẻ lời chúc từ Google Sheets ===== */
+    .wish {
+      background: #ffffff;
+      border-left: 3px solid #c9a96e;
+      border-radius: 10px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 10px rgba(201, 169, 110, 0.12);
+      animation: wishFadeIn 0.5s ease-out both;
+    }
+
+    .wish strong {
+      display: block;
+      color: #a88350;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .wish p {
+      color: #5c3317;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+    }
+
+    /* Scrollbar cho #wishes */
+    #wishes::-webkit-scrollbar {
       width: 4px;
     }
 
-    #guestbook::-webkit-scrollbar-thumb {
+    #wishes::-webkit-scrollbar-thumb {
       background: rgba(201, 169, 110, 0.4);
       border-radius: 2px;
     }
