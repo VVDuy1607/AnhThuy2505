@@ -813,13 +813,18 @@
     <!-- STORY -->
     <section class="section py-6" id="story" style="background:linear-gradient(180deg,#2d1808,#1a0d07)">
 
-      <!-- Card chính dùng Story.webp làm background -->
+      <!-- Card chính chứa ảnh Story.webp -->
       <div class="card tilt-card fade-up mx-3" style="
         position: relative;
         overflow: hidden;
         box-shadow: 0 12px 48px rgba(0,0,0,0.45);
-        background: url('Story.webp') center top / cover no-repeat;
       ">
+      
+        <!-- Hiển thị ảnh đầy đủ 100% không bao giờ bị cắt (tương tự như Gia Đình / Đầu trang) -->
+        <picture>
+          <source srcset="Story.webp" type="image/webp">
+          <img src="Story.webp" alt="Wedding Story Background" style="width: 100%; height: auto; display: block;">
+        </picture>
 
         <!-- Overlay nhạt bên trong để text dễ đọc hơn trên mobile -->
         <div style="
@@ -828,15 +833,14 @@
           pointer-events: none; z-index: 1;
         "></div>
 
-        <!-- ===== NỘI DUNG — bố cục flexbox tự nhiên, không dùng absolute ===== -->
+        <!-- ===== NỘI DUNG ĐẶT NỔI LÊN TRÊN — dùng position:absolute phủ kín khung ảnh ===== -->
         <div style="
-          position: relative; z-index: 2;
+          position: absolute; inset: 0; z-index: 2;
           display: flex;
           flex-direction: column;
           align-items: center;
-          /* padding: top | sides | bottom — bottom để nhường chỗ cho chibi */
-          padding: clamp(48px, 12%, 80px) clamp(16px, 9%, 52px) clamp(155px, 33%, 220px);
-          min-height: clamp(480px, 120vw, 650px);
+          /* Dùng padding % để tỉ lệ luôn chính xác dù màn hình to hay nhỏ */
+          padding: 10% 8% 28%;
           text-align: center;
         ">
 
@@ -867,7 +871,7 @@
             font-family: 'Playfair Display', serif;
             font-style: italic;
             margin: 0;
-            max-width: 95%;
+            max-width: 90%;
           ">
             &ldquo;Tình yêu của chúng tôi không bắt đầu bằng những điều rực rỡ, mà lớn lên từ những điều giản dị mỗi ngày. Từ những ánh nhìn đủ hiểu, những cái nắm tay đủ ấm, chúng tôi dần trở thành một phần không thể thiếu của nhau. Không ồn ào, không phô trương — chỉ lặng lẽ ở bên, nhưng đủ vững vàng để cùng nhau đi hết một hành trình dài. Và từ ngày đó, anh biết... nơi mình muốn quay về, luôn là em 💕&rdquo;
           </p>
