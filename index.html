@@ -932,10 +932,10 @@
               <div
                 style="height:1px;background:linear-gradient(90deg,transparent,rgba(60,94,139,.25),transparent);margin-bottom:10px">
               </div>
-              <p style="color:#455570;font-size:clamp(0.5rem, 2.8vw, 0.7rem);margin-bottom:6px;font-family:'Playfair Display',serif;white-space:nowrap">
-                Ông: <span style="font-size:clamp(0.65rem, 3.8vw, 0.95rem); color: #2d4a73; font-style:italic">Hoàng Phú Thắng</span></p>
-              <p style="color:#455570;font-size:clamp(0.5rem, 2.8vw, 0.7rem);margin-bottom:12px;font-family:'Playfair Display',serif;white-space:nowrap">
-                Bà: <span style="font-size:clamp(0.65rem, 3.8vw, 0.95rem); color: #2d4a73; font-style:italic">Phạm Thị Doan</span></p>
+              <p style="color:#455570;font-size:clamp(0.45rem, 2.4vw, 0.65rem);margin-bottom:6px;font-family:'Playfair Display',serif;white-space:nowrap">
+                Ông: <span style="font-size:clamp(0.55rem, 3.2vw, 0.85rem); color: #2d4a73; font-style:italic">Hoàng Phú Thắng</span></p>
+              <p style="color:#455570;font-size:clamp(0.45rem, 2.4vw, 0.65rem);margin-bottom:12px;font-family:'Playfair Display',serif;white-space:nowrap">
+                Bà: <span style="font-size:clamp(0.55rem, 3.2vw, 0.85rem); color: #2d4a73; font-style:italic">Phạm Thị Doan</span></p>
               <p style="color:#6a9bca;font-size:clamp(0.55rem, 2.5vw, 0.65rem);font-style:italic;letter-spacing:.5px;line-height:1.4">📍 Tp. Hải Phòng</p>
             </div>
 
@@ -947,10 +947,10 @@
               <div
                 style="height:1px;background:linear-gradient(90deg,transparent,rgba(139,94,60,.25),transparent);margin-bottom:10px">
               </div>
-              <p style="color:#6b5545;font-size:clamp(0.5rem, 2.8vw, 0.7rem);margin-bottom:6px;font-family:'Playfair Display',serif;white-space:nowrap">
-                Ông: <span style="font-size:clamp(0.65rem, 3.8vw, 0.95rem); color: #70452d; font-style:italic">Vũ Hữu Sỹ</span></p>
-              <p style="color:#6b5545;font-size:clamp(0.5rem, 2.8vw, 0.7rem);margin-bottom:12px;font-family:'Playfair Display',serif;white-space:nowrap">
-                Bà: <span style="font-size:clamp(0.65rem, 3.8vw, 0.95rem); color: #70452d; font-style:italic">Bùi Thị Dung</span></p>
+              <p style="color:#6b5545;font-size:clamp(0.45rem, 2.4vw, 0.65rem);margin-bottom:6px;font-family:'Playfair Display',serif;white-space:nowrap">
+                Ông: <span style="font-size:clamp(0.55rem, 3.2vw, 0.85rem); color: #70452d; font-style:italic">Vũ Hữu Sỹ</span></p>
+              <p style="color:#6b5545;font-size:clamp(0.45rem, 2.4vw, 0.65rem);margin-bottom:12px;font-family:'Playfair Display',serif;white-space:nowrap">
+                Bà: <span style="font-size:clamp(0.55rem, 3.2vw, 0.85rem); color: #70452d; font-style:italic">Bùi Thị Dung</span></p>
               <p style="color:#c9a96e;font-size:clamp(0.55rem, 2.5vw, 0.65rem);font-style:italic;letter-spacing:.5px;line-height:1.4">📍 Tp. Hải Phòng</p>
             </div>
 
@@ -1355,7 +1355,7 @@
       setTimeout(() => {
         document.getElementById('env-card').style.opacity = '0';
         const o = document.getElementById('env-overlay'); o.style.transition = 'opacity 0.8s'; o.style.opacity = '0';
-        setTimeout(() => { o.style.display = 'none'; document.getElementById('bg-music').play().catch(() => { }); }, 800);
+        setTimeout(() => { o.style.display = 'none'; document.getElementById('bg-music').play().catch(() => { }); playing = true; }, 800);
       }, 1700);
     });
 
