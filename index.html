@@ -812,18 +812,31 @@
 
     <!-- STORY -->
     <section class="section py-6" id="story" style="background:linear-gradient(180deg,#2d1808,#1a0d07)">
-      <div class="card tilt-card mx-3 p-6 text-center">
-        <p class="sect-label">CHUYỆN TÌNH</p>
-        <h2 class="fade-up script" style="font-size:clamp(2.5rem,9vw,3.5rem);color:#2d1808;margin-top:6px">Our Love
-          Story</h2>
-        <div class="gold-line"></div>
-        <p class="fade-up"
-          style="font-size:.95rem;color:#7a6055;line-height:2.1;margin-top:24px;text-align:justify;font-family:'Poppins',sans-serif">
-          "Tình yêu của chúng tôi không bắt đầu bằng những điều rực rỡ, mà lớn lên từ những điều giản dị mỗi ngày. Từ
-          những ánh nhìn đủ hiểu, những cái nắm tay đủ ấm, chúng tôi dần trở thành một phần không thể thiếu của nhau.
-          Không ồn ào, không phô trương — chỉ lặng lẽ ở bên, nhưng đủ vững vàng để cùng nhau đi hết một hành trình dài.
-          Và từ ngày đó, anh biết... nơi mình muốn quay về, luôn là em."
-        </p>
+      <div class="tilt-card mx-3 fade-up" style="position: relative; max-width: 600px; margin: 0 auto;">
+        
+        <!-- Khung nền lấy từ ảnh Story.png -->
+        <img src="Story.png" alt="Story Frame" loading="lazy" style="width: 100%; height: auto; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); display: block;">
+        
+        <!-- Tên và trái tim lấp khoảng trống -->
+        <div style="position: absolute; bottom: 8%; left: 40%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5;">
+          <span class="name-script" style="font-size: clamp(1.5rem, 6vw, 2.25rem); color: #5c3317; line-height: 1;">Trọng Anh</span>
+          <img src="Heart_new.png" alt="Heart" style="width: 45px; margin: 8px 0; filter: drop-shadow(0 2px 5px rgba(201,169,110,0.6));" loading="lazy">
+          <span class="name-script" style="font-size: clamp(1.5rem, 6vw, 2.25rem); color: #5c3317; line-height: 1;">Vũ Thùy</span>
+        </div>
+
+        <!-- Nội dung HTML gốc nổi lên trên khung ảnh -->
+        <div class="text-center" style="position: absolute; top: 12%; bottom: 38%; left: 12%; right: 12%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5;">
+          <p class="sect-label" style="font-size: clamp(0.65rem, 2vw, 0.85rem); margin-bottom: 0;">CHUYỆN TÌNH</p>
+          <h2 class="script" style="font-size:clamp(2rem,7vw,3.2rem);color:#2d1808;margin-top:2px; margin-bottom: 0;">Our Love Story</h2>
+          <div class="gold-line" style="margin: 10px auto 0;"></div>
+          <p style="font-size:clamp(0.75rem, 2.3vw, 1.05rem);color:#7a6055;line-height:1.9;text-align:justify;font-family:'Playfair Display',serif;font-style:italic; margin: -15px 0 10px 0;">
+            " Tình yêu của chúng tôi không bắt đầu bằng những điều rực rỡ, mà lớn lên từ những điều giản dị mỗi ngày. Từ
+            những ánh nhìn đủ hiểu, những cái nắm tay đủ ấm, chúng tôi dần trở thành một phần không thể thiếu của nhau.
+            Không ồn ào, không phô trương — chỉ lặng lẽ ở bên, nhưng đủ vững vàng để cùng nhau đi hết một hành trình dài.
+            Và từ ngày đó, anh biết... nơi mình muốn quay về, luôn là em 💕 "
+          </p>
+        </div>
+        
       </div>
     </section>
 
@@ -859,10 +872,10 @@
               <div
                 style="height:1px;background:linear-gradient(90deg,transparent,rgba(60,94,139,.25),transparent);margin-bottom:10px">
               </div>
-              <p style="color:#455570;font-size:.72rem;margin-bottom:3px;font-family:'Poppins',sans-serif">
-                Ông: <strong>Hoàng Phú Thắng</strong></p>
-              <p style="color:#455570;font-size:.72rem;margin-bottom:10px;font-family:'Poppins',sans-serif">
-                Bà: <strong>Phạm Thị Doan</strong></p>
+              <p style="color:#455570;font-size:.75rem;margin-bottom:5px;font-family:'Playfair Display',serif">
+                Ông: <strong style="font-size: .85rem; color: #2d4a73;">Hoàng Phú Thắng</strong></p>
+              <p style="color:#455570;font-size:.75rem;margin-bottom:12px;font-family:'Playfair Display',serif">
+                Bà: <strong style="font-size: .85rem; color: #2d4a73;">Phạm Thị Doan</strong></p>
               <p style="color:#6a9bca;font-size:.65rem;font-style:italic;letter-spacing:.5px;line-height:1.4">📍 Tp. Hải
                 Phòng</p>
             </div>
@@ -875,10 +888,10 @@
               <div
                 style="height:1px;background:linear-gradient(90deg,transparent,rgba(139,94,60,.25),transparent);margin-bottom:10px">
               </div>
-              <p style="color:#6b5545;font-size:.72rem;margin-bottom:3px;font-family:'Poppins',sans-serif">
-                Ông: <strong>Vũ Hữu Sỹ</strong></p>
-              <p style="color:#6b5545;font-size:.72rem;margin-bottom:10px;font-family:'Poppins',sans-serif">
-                Bà: <strong>Bùi Thị Dung</strong></p>
+              <p style="color:#6b5545;font-size:.75rem;margin-bottom:5px;font-family:'Playfair Display',serif">
+                Ông: <strong style="font-size: .85rem; color: #70452d;">Vũ Hữu Sỹ</strong></p>
+              <p style="color:#6b5545;font-size:.75rem;margin-bottom:12px;font-family:'Playfair Display',serif">
+                Bà: <strong style="font-size: .85rem; color: #70452d;">Bùi Thị Dung</strong></p>
               <p style="color:#c9a96e;font-size:.65rem;font-style:italic;letter-spacing:.5px;line-height:1.4">📍 Tp. Hải
                 Phòng</p>
             </div>
@@ -1114,11 +1127,12 @@
         <div class="fade-up mx-auto"
           style="width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s ease"
           onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"
-          onclick="document.getElementById('gift-modal').style.display='flex'">
+          onclick="document.getElementById('gift-modal').style.display='flex'; document.getElementById('gift-hint').textContent='Cảm ơn bạn rất nhiều 💛';">
           <div
-            style="font-size:5.5rem; filter: drop-shadow(0 10px 20px rgba(201,169,110,0.3)); animation: giftSway 3s ease-in-out infinite">
+            style="font-size:5.5rem; filter: drop-shadow(0 10px 20px rgba(201,169,110,0.3)); animation: giftSway 1.2s ease-in-out infinite">
             🎁</div>
         </div>
+        <p id="gift-hint" class="fade-up" style="color:#a07850; font-size:0.78rem; margin-top:-10px; font-style:italic; transition: 0.3s ease;">(Một bất ngờ đang chờ bạn…)</p>
       </div>
 
     </section>
@@ -1456,7 +1470,7 @@
         }).join('');
 
         if (statusEl) {
-          statusEl.textContent = '✨ ' + docs.length + ' lời chúc · cập nhật theo thời gian thực';
+          statusEl.textContent = '✨ ' + docs.length + ' lời chúc - Cảm ơn tình yêu thương của bạn ';
         }
       }
 
@@ -1612,11 +1626,11 @@
 
       0%,
       100% {
-        transform: rotate(-8deg);
+        transform: rotate(-12deg);
       }
 
       50% {
-        transform: rotate(8deg);
+        transform: rotate(12deg);
       }
     }
 
