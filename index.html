@@ -1470,10 +1470,13 @@
     document.querySelectorAll('.fade-up').forEach(el => { new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: .08 }).observe(el); });
 
     // ============================================================
-    // GUESTBOOK — Firebase Firestore Realtime
-    // Collection: "wishes" | Fields: name, msg, createdAt
+    // GUESTBOOK — Firebase Firestore Realtime (multi-tenant)
+    // Collection: "wishes" | Fields: name, msg, weddingId, createdAt
     // ============================================================
     (function () {
+
+      // ⭐ ID đạm cưới này — thay đổi được để dùng lại code cho web khác
+      var WEDDING_ID = 'anhthuy2505-nhatrai';
 
       // ---- Cấu hình Firebase ----
       var firebaseConfig = {
@@ -1536,7 +1539,8 @@
         var statusEl = document.getElementById('gb-status');
 
         db.collection('wishes')
-          .orderBy('createdAt', 'desc')   // Mới nhất lên đầu
+          .where('weddingId', '==', WEDDING_ID)   // Chỉ lấy lời chúc của đám cưới này
+          .orderBy('createdAt', 'desc')            // Mới nhất lên đầu
           .onSnapshot(
             function (snapshot) {
               console.log('[Firebase] Nhận', snapshot.docs.length, 'lời chúc');
@@ -1557,8 +1561,9 @@
       // Expose hàm addWish để form submit sử dụng
       window._addWish = function (name, msg) {
         return db.collection('wishes').add({
-          name: name,
-          msg: msg,
+          name:      name,
+          msg:       msg,
+          weddingId: WEDDING_ID,                                  // Đạm cưới này
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
       };
