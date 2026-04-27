@@ -1280,9 +1280,6 @@
 
   <button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Lên đầu trang">↑</button>
 
-  <!-- Firebase SDK (compat v9 — chạy thẳng trong HTML, không cần bundler) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script>
@@ -1469,147 +1466,146 @@
     new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: .08 }).observe.bind(null);
     document.querySelectorAll('.fade-up').forEach(el => { new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: .08 }).observe(el); });
 
-    // ============================================================
-    // GUESTBOOK — Firebase Firestore Realtime (multi-tenant)
-    // Collection: "wishes" | Fields: name, msg, weddingId, createdAt
-    // ============================================================
-    (function () {
+  </script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      query,
+      where,
+      orderBy,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-      // ⭐ ID đạm cưới này — thay đổi được để dùng lại code cho web khác
-      var WEDDING_ID = 'AnhThuy2505';
+    // ===== FIREBASE CONFIG (USER MUST EDIT) =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsL4ZX7gRSZqS4xGUAxTrIakHPp8Kpaz4",
+      authDomain: "wedding-55c10.firebaseapp.com",
+      projectId: "wedding-55c10",
+    };
 
-      // ---- Cấu hình Firebase ----
-      var firebaseConfig = {
-        apiKey: 'AIzaSyCsL4ZX7gRSZqS4xGUAxTrIakHPp8Kpaz4',
-        authDomain: 'wedding-55c10.firebaseapp.com',
-        projectId: 'wedding-55c10',
-        storageBucket: 'wedding-55c10.firebasestorage.app',
-        messagingSenderId: '500987579882',
-        appId: '1:500987579882:web:ce179772569fb18d19b693'
-      };
+    let app, db;
 
-      // Khởi tạo Firebase (tránh khởi tạo lại nếu đã có)
-      var app;
-      try {
-        app = firebase.app();
-      } catch (e) {
-        app = firebase.initializeApp(firebaseConfig);
-      }
-      var db = firebase.firestore();
+    function initFirebase() {
+      app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+    }
 
-      // ---- Escape HTML tránh XSS ----
-      function esc(s) {
-        if (!s) return '';
-        return s
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      }
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
 
-      // ---- Render danh sách lời chúc ----
-      function render(docs) {
-        var container = document.getElementById('wishes');
-        var statusEl = document.getElementById('gb-status');
-        if (!container) return;
+    function listenWishes() {
+      const q = query(
+        collection(db, "wishes"),
+        where("weddingId", "==", "AnhThuy2505"),
+        orderBy("timestamp", "desc")
+      );
 
-        if (docs.length === 0) {
-          container.innerHTML = '<p style="text-align:center;color:rgba(122,96,85,0.6);font-size:.85rem;padding:12px 0;">Chưa có lời chúc nào. Hãy là người đầu tiên! 💌</p>';
+      const wishList = document.getElementById("wishes");
+      const statusEl = document.getElementById("gb-status");
+
+      onSnapshot(q, (snapshot) => {
+        if (!wishList) return;
+        
+        let html = "";
+        if (snapshot.empty) {
+          html = '<p style="text-align:center;color:rgba(122,96,85,0.6);font-size:.85rem;padding:12px 0;">Chưa có lời chúc nào. Hãy là người đầu tiên! 💌</p>';
           if (statusEl) statusEl.textContent = '0 lời chúc';
+        } else {
+          snapshot.forEach((doc, i) => {
+            const data = doc.data();
+            const delay = Math.min(i * 0.07, 0.42);
+            html += `
+              <div class="wish" style="animation-delay:${delay}s">
+                <strong>${escapeHtml(data.name)}</strong>
+                <p>${escapeHtml(data.message)}</p>
+              </div>
+            `;
+          });
+          if (statusEl) statusEl.textContent = '✨ ' + snapshot.size + ' lời chúc · Cảm ơn lời yêu thương của bạn';
+        }
+        wishList.innerHTML = html;
+        
+      }, (error) => {
+        console.error("Firestore onSnapshot Error:", error);
+        
+        // If you see "failed-precondition":
+        // Go to browser console → click Firebase link → create index
+        if (error.code === "failed-precondition") {
+          if (wishList) {
+            wishList.innerHTML = "<p style='color:red;'>Hệ thống đang thiết lập index lần đầu, vui lòng chờ vài phút và tải lại trang.</p>";
+          }
+        }
+      });
+    }
+
+    initFirebase();
+    document.addEventListener("DOMContentLoaded", listenWishes);
+
+    // RSVP Form — Lưu vào Firebase Firestore
+    const rsvpForm = document.getElementById('rsvp-form');
+    if (rsvpForm) {
+      rsvpForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        
+        const nameEl = document.getElementById("r-name");
+        const msgEl = document.getElementById("r-msg");
+        
+        if (!nameEl || !msgEl) return;
+        
+        const name = nameEl.value.trim();
+        const message = msgEl.value.trim();
+
+        if (!name || !message) {
+          alert("Vui lòng nhập đầy đủ tên và lời chúc.");
           return;
         }
 
-        container.innerHTML = docs.map(function (doc, i) {
-          var d = doc.data();
-          return (
-            '<div class="wish" style="animation-delay:' + Math.min(i * 0.07, 0.42) + 's">' +
-            '<strong>' + esc(d.name) + '</strong>' +
-            '<p>' + esc(d.msg) + '</p>' +
-            '</div>'
-          );
-        }).join('');
-
-        if (statusEl) {
-          statusEl.textContent = '✨ ' + docs.length + ' lời chúc - Cảm ơn tình yêu thương của bạn ';
+        if (message.length >= 300) {
+          alert("Vui lòng nhập lời chúc dưới 300 ký tự.");
+          return;
         }
-      }
 
-      // ---- Lắng nghe thay đổi realtime (onSnapshot) ----
-      function startRealtime() {
-        var statusEl = document.getElementById('gb-status');
+        const btn = this.querySelector('button[type="submit"]');
+        const rsvpOk = document.getElementById('rsvp-ok');
 
-        db.collection('wishes')
-          .where('weddingId', '==', WEDDING_ID)   // Chỉ lấy lời chúc của đám cưới này
-          .orderBy('createdAt', 'desc')            // Mới nhất lên đầu
-          .onSnapshot(
-            function (snapshot) {
-              console.log('[Firebase] Nhận', snapshot.docs.length, 'lời chúc');
-              render(snapshot.docs);
-            },
-            function (err) {
-              console.error('[Firebase] Lỗi onSnapshot:', err);
-              if (statusEl) {
-                statusEl.textContent = '⚠️ Không thể tải lời chúc: ' + err.code;
-              }
-            }
-          );
-      }
+        if (btn) { btn.disabled = true; btn.textContent = 'Đang gửi...'; }
 
-      // Chạy sau khi DOM sẵn sàng
-      document.addEventListener('DOMContentLoaded', startRealtime);
-
-      // Expose hàm addWish để form submit sử dụng
-      window._addWish = function (name, msg) {
-        return db.collection('wishes').add({
-          name:      name,
-          msg:       msg,
-          weddingId: WEDDING_ID,                                  // Đạm cưới này
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      };
-
-    })();
-
-    // RSVP Form — Lưu vào Firebase Firestore
-    document.getElementById('rsvp-form').addEventListener('submit', function (e) {
-      e.preventDefault();
-      var n = document.getElementById('r-name').value.trim();
-      var m = document.getElementById('r-msg').value.trim();
-
-      // Validate: không cho gửi nếu thiếu tên hoặc lời chúc
-      if (!n || !m) {
-        alert('Vui lòng nhập tên và lời chúc trước khi gửi! 💌');
-        return;
-      }
-
-      if (typeof window._addWish !== 'function') {
-        console.error('[RSVP] Firebase chưa sẵn sàng (_addWish not defined)');
-        return;
-      }
-
-      var btn = this.querySelector('button[type="submit"]');
-      var rsvpOk = document.getElementById('rsvp-ok');
-
-      // Vô hiệu hoá button khi đang gửi
-      if (btn) { btn.disabled = true; btn.textContent = 'Đang gửi...'; }
-
-      window._addWish(n, m)
-        .then(function () {
-          rsvpOk.innerHTML = '💕 Cảm ơn <strong>' + n + '</strong> đã gửi lời chúc!';
-          rsvpOk.style.display = 'block';
-          document.getElementById('rsvp-form').reset();
-          setTimeout(function () { rsvpOk.style.display = 'none'; }, 5000);
-        })
-        .catch(function (err) {
-          console.error('[RSVP] Lỗi khi lưu:', err);
-          rsvpOk.innerHTML = '⚠️ Gửi thất bại: ' + err.code + '. Vui lòng thử lại.';
-          rsvpOk.style.display = 'block';
-        })
-        .finally(function () {
+        try {
+          await addDoc(collection(db, "wishes"), {
+            weddingId: "AnhThuy2505",
+            name: name,
+            message: message,
+            timestamp: serverTimestamp()
+          });
+          
+          if (rsvpOk) {
+            rsvpOk.innerHTML = '💕 Cảm ơn <strong>' + escapeHtml(name) + '</strong> đã gửi lời chúc!';
+            rsvpOk.style.display = 'block';
+            setTimeout(() => { rsvpOk.style.display = 'none'; }, 5000);
+          }
+          rsvpForm.reset();
+        } catch (error) {
+          console.error("Lỗi khi lưu dữ liệu:", error);
+          if (rsvpOk) {
+            rsvpOk.innerHTML = '⚠️ Gửi thất bại: ' + error.code + '. Vui lòng thử lại.';
+            rsvpOk.style.display = 'block';
+          }
+        } finally {
           if (btn) { btn.disabled = false; btn.textContent = 'Gửi Lời Chúc 💌'; }
-        });
-    });
-
+        }
+      });
+    }
+  </script>
+  <script>
     // Copy STK
     function copyText(t, id) { navigator.clipboard.writeText(t).then(() => { const b = document.getElementById(id); if (b) { b.textContent = '✅ Đã sao chép!'; setTimeout(() => b.textContent = '📋 Sao chép STK', 2000); } }).catch(() => alert('STK: ' + t)); }
 
