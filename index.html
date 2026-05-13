@@ -1,7 +1,16 @@
 <head>
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
+
+  <!-- 🔒 BUỘC LIGHT MODE -->
+  <meta name="color-scheme" content="light only">
+  <meta name="theme-color" content="#ffffff">
+  <style>
+    :root, html, body { color-scheme: light !important; }
+    @media (prefers-color-scheme: dark) {
+      :root, html, body, * { color-scheme: light !important; }
+      .card, .container, .section, .bg-white, [class*="bg-"] { background-color: initial !important; }
+    }
+  </style>
+
   <!-- 🔥 OPEN GRAPH (ĐẶT LÊN ĐẦU TIÊN) -->
   <meta property="og:title" content="Thiệp cưới Trọng Anh & Vũ Thùy 💍">
   <meta property="og:description" content="Trân trọng kính mời bạn đến chung vui cùng chúng tôi ❤️">
@@ -31,9 +40,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Preload critical display fonts to prevent FOUT -->
-  <link rel="preload" as=""
+  <link rel="preload" as="style"
     href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;700&family=Poppins:wght@300;400;500&display=block">
-  <link rel="sheet"
+  <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;700&family=Poppins:wght@300;400;500&display=block">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
