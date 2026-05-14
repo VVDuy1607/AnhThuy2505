@@ -4,10 +4,21 @@
   <meta name="color-scheme" content="light only">
   <meta name="theme-color" content="#ffffff">
   <style>
-    :root, html, body { color-scheme: light !important; }
+    /* Ngăn trình duyệt tự invert màu form controls khi hệ điều hành ở Dark Mode */
+    :root { color-scheme: light only; }
+
     @media (prefers-color-scheme: dark) {
-      :root, html, body, * { color-scheme: light !important; }
-      .card, .container, .section, .bg-white, [class*="bg-"] { background-color: initial !important; }
+      /* Form controls — giữ nguyên màu gốc, không để browser đổi thành nền đen */
+      input, textarea, select, button, [type="text"], [type="email"], [type="submit"] {
+        color-scheme: light !important;
+        background-color: #ffffff !important;
+        color: #2d1808 !important;
+        border-color: #e8d5c0 !important;
+      }
+      /* Scrollbar giữ màu vàng gold */
+      ::-webkit-scrollbar-thumb { background: #c9a96e !important; }
+      /* Emoji / icon không bị invert */
+      img, svg, canvas { filter: none !important; }
     }
   </style>
 
@@ -627,7 +638,7 @@
   </button>
 
   <audio id="bg-music" loop>
-    <source src="Westlife%20-%20Beautiful%20in%20white.mp3" type="audio/mpeg">
+    <source src="TA Music.m4a" type="audio/mp4">
   </audio>
 
   <!-- ENVELOPE -->
